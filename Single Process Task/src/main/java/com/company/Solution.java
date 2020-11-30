@@ -10,9 +10,8 @@ import com.company.task.Queue;
 */
 
 /**
- * This solution tries to use pure java concurrency statements to resolve the challenge. It uses two
- * separate thread as the players. A concurrentHashMap used to simulate a two-way queue to get or
- * put a message simultaneously.
+ * This solution tries to use pure java concurrency statements to resolve the task. It uses two
+ * separate threads as a player.
  */
 public class Solution {
   private static final String PLAYER_1 = "Initiator";

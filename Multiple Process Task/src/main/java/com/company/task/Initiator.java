@@ -1,14 +1,15 @@
 package com.company.task;
 
 /*
-  @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
- * @version 1.0 2020.11.27
- * @since 1.0
- */
+ @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
+* @version 1.0 2020.11.27
+* @since 1.0
+*/
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ServerSocket;
+import java.net.InetAddress;
 import java.net.Socket;
 
 /**
@@ -17,17 +18,16 @@ import java.net.Socket;
  * networking usually is a good approach. Initiator and Responder in my solution communicate on a
  * same port (4020) and local machine.
  *
- * <p>The Initiator object opens a socket as a server and send 'Hello guys' to the Responder. After
- * that the Responder replies to the message with the number of messages that are already sent. The
- * Initiator read and print the reply message. The messages stored in an array and the Initiator
- * send them sequentially. The send or receive operations depend on the message array length, so you
- * can add or delete the messages in a simple way.
+ * <p>The Initiator object opens a socket as a client and send 'Hello guys' to the Responder
+ * (server). After that the Responder replies to the message with the number of messages that are
+ * already sent. The Initiator read and print the reply message. The messages stored in an array and
+ * the Initiator send them sequentially. The send or receive operations depend on the message array
+ * length, so you can add or delete the messages in a simple way.
  */
 public final class Initiator {
-  private ServerSocket serverSocket;
-  private Socket connection = null;
-  private ObjectOutputStream out;
+  private Socket clientSocket;
   private ObjectInputStream in;
+  private ObjectOutputStream out;
 
   // Store 10 messages in an array to send them sequentially.
   private String[] messages = {
@@ -94,19 +94,17 @@ public final class Initiator {
 
   // Setup and running the Initiator
   private void openSocket() throws IOException {
-    serverSocket = new ServerSocket(4020, 10);
-    System.out.println("Server Status: Waiting for connection");
-    connection = serverSocket.accept();
+    clientSocket = new Socket(InetAddress.getLocalHost(), 4020);
     System.out.println(
-        "Server Status: Connection received from " + connection.getInetAddress().getHostName());
-    out = new ObjectOutputStream(connection.getOutputStream());
+        "Connected to" + InetAddress.getLocalHost() + " on port " + clientSocket.getPort());
+    in = new ObjectInputStream(clientSocket.getInputStream());
+    out = new ObjectOutputStream(clientSocket.getOutputStream());
     out.flush();
-    in = new ObjectInputStream(connection.getInputStream());
   }
 
   private void closeSocket() throws IOException {
     in.close();
     out.close();
-    serverSocket.close();
+    clientSocket.close();
   }
 }

@@ -1,24 +1,27 @@
 package com.company.task;
 
 /*
-  @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
- * @version 1.0 2020.11.27
- * @since 1.0
- */
+ @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
+* @version 1.0 2020.11.27
+* @since 1.0
+*/
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
+
 /**
- * The Responder object opens a socket as a client, also it replies to a message with the number of
+ * The Responder object opens a socket as a server, also it replies to a message with the number of
  * messages that are already sent to the Initiator before.
  */
 public final class Responder {
   private String message;
-  private Socket clientSocket;
   private ObjectInputStream in;
   private ObjectOutputStream out;
+  private Socket connection = null;
+  private ServerSocket serverSocket;
 
   // Keep receive messages' count
   private int numberOfReceives = 0;
@@ -49,7 +52,7 @@ public final class Responder {
       try {
         message = (String) in.readObject();
         sendMessage(
-            "Client reply:"
+            "Server reply:"
                 + "'"
                 + message.toUpperCase()
                 + "', "
@@ -70,17 +73,19 @@ public final class Responder {
 
   // Setup and running the Responder
   private void openSocket() throws IOException {
-    clientSocket = new Socket(InetAddress.getLocalHost(), 4020);
+    serverSocket = new ServerSocket(4020, 10);
+    System.out.println("Server Status: Waiting for connection");
+    connection = serverSocket.accept();
     System.out.println(
-        "Connected to" + InetAddress.getLocalHost() + "in port " + clientSocket.getPort());
-    in = new ObjectInputStream(clientSocket.getInputStream());
-    out = new ObjectOutputStream(clientSocket.getOutputStream());
+        "Server Status: Connection received from " + connection.getInetAddress().getHostName());
+    out = new ObjectOutputStream(connection.getOutputStream());
     out.flush();
+    in = new ObjectInputStream(connection.getInputStream());
   }
 
   private void closeSocket() throws IOException {
     in.close();
     out.close();
-    clientSocket.close();
+    serverSocket.close();
   }
 }

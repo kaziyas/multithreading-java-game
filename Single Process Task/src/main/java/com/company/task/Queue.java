@@ -5,10 +5,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
+/*
  * @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
  * @version 1.0 2020.11.30
  * @since 1.0
+ */
+
+/**
+ * A concurrentHashMap used to simulate a two-way queue to get or put a message simultaneously. It
+ * uses a queue is the BlockingQueue that capacity bounded, so at any given time, it has a remaining
+ * capacity beyond which no additional messages can be put without blocking in a multi-threaded
+ * context.
  */
 public class Queue {
   private final Map<String, BlockingQueue<String>> queue = new ConcurrentHashMap<>(2);

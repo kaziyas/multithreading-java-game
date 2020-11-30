@@ -1,15 +1,13 @@
 package com.company;
 
 import com.company.task.Player;
-import java.util.Map;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
+import com.company.task.Queue;
 
 /*
-  @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
- * @version 1.0 2020.11.27
- * @since 1.0
- */
+ @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
+* @version 1.0 2020.11.27
+* @since 1.0
+*/
 
 /**
  * This solution tries to use pure java concurrency statements to resolve the challenge. It uses two
@@ -23,8 +21,7 @@ public class Solution {
   // Run app into a single process and create two separate threads that send or reply a
   // massage.
   public static void main(String[] args) {
-    final Map<String, BlockingQueue<String>> queue = new ConcurrentHashMap<>(2);
-
+    Queue queue = new Queue();
     new Thread(new Player(PLAYER_1, PLAYER_2, true, queue)).start();
     new Thread(new Player(PLAYER_2, PLAYER_1, false, queue)).start();
   }

@@ -1,15 +1,12 @@
 package com.company.task;
 
-import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
-  @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
- * @version 1.0 2020.11.27
- * @since 1.0
- */
+ @author Yaser Kazerooni (yaser.kazerooni@gmail.com)
+* @version 1.0 2020.11.27
+* @since 1.0
+*/
 
 /**
  * A Player is guaranteed to behave sensibly when the object is being operated on via two threads.
@@ -27,7 +24,7 @@ public final class Player implements Runnable {
   private final String name;
   private final String partner;
   private final boolean initiator;
-  private final Map<String, BlockingQueue<String>> queue;
+  private final Queue queue;
   private String[] messages = {
     "Hello guys :)",
     "My name is yaser!",
@@ -45,63 +42,43 @@ public final class Player implements Runnable {
   private AtomicInteger numberOfCalls = new AtomicInteger(0);
   private AtomicInteger numberOfReceives = new AtomicInteger(0);
 
-  public Player(
-      String name, String partner, boolean initiator, Map<String, BlockingQueue<String>> queue) {
+  public Player(String name, String partner, boolean initiator, Queue queue) {
     this.name = name;
     this.partner = partner;
     this.initiator = initiator;
     this.queue = queue;
   }
 
-  // Keep a Initiator or Partner message in a thread-safe queue
-  private synchronized BlockingQueue<String> isQueueAvailable(String key) {
-    return queue.computeIfAbsent(key, k -> new ArrayBlockingQueue<>(1));
-  }
-
-  // Put a message in queue depends on Initiator's or Partner's key
-  private boolean put(String key, String value) {
-    BlockingQueue<String> queue = isQueueAvailable(key);
-    return queue.offer(value);
-  }
-
-  // Get a message in queue depends on Initiator's or Partner's key
-  private String get(String key) {
-    BlockingQueue<String> queue = isQueueAvailable(key);
-    return queue.poll();
-  }
-
   //  Get the Initiator last message from own queue and put a new message in the partner's
   // queue. The Partner put a message into the Initiator's queue to reply back
   @Override
   public void run() {
-    String receivedMessage;
-    int callsCounter = 0;
-    int receivesCounter = 0;
-
     init();
     try {
-      while (callsCounter < messages.length && receivesCounter < messages.length) {
-        if ((receivedMessage = get(name)) != null) {
-          callsCounter = incrementAndGetCalls();
+      String receivedMessage;
+      while (numberOfCalls.intValue() < messages.length
+          && numberOfReceives.intValue() < messages.length) {
+        if ((receivedMessage = queue.get(name)) != null) {
+          incrementAndGetCalls();
           if (initiator) {
             System.out.println(receivedMessage);
-            if (callsCounter < messages.length) {
-              String message = messages[callsCounter];
-              put(partner, message);
+            if (numberOfCalls.intValue() < messages.length) {
+              String message = messages[numberOfCalls.intValue()];
+              queue.put(partner, message);
               System.out.println(Thread.currentThread().getName() + " send a message: " + message);
             }
           } else {
-            put(
-                partner,
+            String message =
                 Thread.currentThread().getName()
                     + " : Client reply:"
                     + "'"
                     + receivedMessage.toUpperCase()
                     + "', "
-                    + receivesCounter
-                    + " messages already sent before.");
+                    + numberOfReceives.intValue()
+                    + " messages already sent before.";
+            queue.put(partner, message);
           }
-          receivesCounter = incrementAndGetReceives();
+          incrementAndGetReceives();
         }
       }
     } catch (InterruptedException interruptedException) {
@@ -113,20 +90,18 @@ public final class Player implements Runnable {
   private void init() {
     if (initiator) {
       String message = messages[0];
-      put(partner, message);
+      queue.put(partner, message);
       System.out.println(Thread.currentThread().getName() + " send a message: " + message);
     }
   }
 
-  private int incrementAndGetCalls() throws InterruptedException {
-    final int counter = numberOfCalls.incrementAndGet();
+  private void incrementAndGetCalls() throws InterruptedException {
+    numberOfCalls.incrementAndGet();
     Thread.sleep(200);
-    return counter;
   }
 
-  private int incrementAndGetReceives() throws InterruptedException {
-    final int counter = numberOfReceives.incrementAndGet();
+  private void incrementAndGetReceives() throws InterruptedException {
+    numberOfReceives.incrementAndGet();
     Thread.sleep(200);
-    return counter;
   }
 }

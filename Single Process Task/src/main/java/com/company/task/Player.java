@@ -49,7 +49,7 @@ public final class Player implements Runnable {
     this.queue = queue;
   }
 
-  //  Get the Initiator last message from own queue and put a new message in the partner's
+  // Get the Initiator last message from own queue and put a new message in the partner's
   // queue. The Partner put a message into the Initiator's queue to reply back
   @Override
   public void run() {
@@ -59,7 +59,7 @@ public final class Player implements Runnable {
       while (numberOfCalls.intValue() < messages.length
           && numberOfReceives.intValue() < messages.length) {
         if ((receivedMessage = queue.get(name)) != null) {
-          incrementAndGetCalls();
+          incrementCalls();
           if (initiator) {
             System.out.println(receivedMessage);
             if (numberOfCalls.intValue() < messages.length) {
@@ -78,7 +78,7 @@ public final class Player implements Runnable {
                     + " messages already sent before.";
             queue.put(partner, message);
           }
-          incrementAndGetReceives();
+          incrementReceives();
         }
       }
     } catch (InterruptedException interruptedException) {
@@ -95,12 +95,12 @@ public final class Player implements Runnable {
     }
   }
 
-  private void incrementAndGetCalls() throws InterruptedException {
+  private void incrementCalls() throws InterruptedException {
     numberOfCalls.incrementAndGet();
     Thread.sleep(200);
   }
 
-  private void incrementAndGetReceives() throws InterruptedException {
+  private void incrementReceives() throws InterruptedException {
     numberOfReceives.incrementAndGet();
     Thread.sleep(200);
   }

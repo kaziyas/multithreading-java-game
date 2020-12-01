@@ -31,7 +31,7 @@ public final class Responder {
     responder.run();
   }
 
-  private void run() {
+  public final void run() {
     try {
       openSocket();
       processMessage();

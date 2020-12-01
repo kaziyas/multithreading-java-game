@@ -53,7 +53,7 @@ public final class Initiator {
   }
 
   // Run the related methods to open, process, and close the communication.
-  private void run() {
+  public final void run() {
     try {
       openSocket();
       processMessage();
@@ -71,14 +71,10 @@ public final class Initiator {
   // Send or receive a message to/from the Responder
   private void processMessage() throws IOException {
     sendMessage(messages[numberOfCalls]);
-    while (numberOfReceives < messages.length) {
+    while (numberOfReceives < messages.length && numberOfCalls <= messages.length) {
       try {
-        String message = (String) in.readObject();
-        numberOfReceives++;
-        System.out.println(message);
-
-        if (numberOfCalls < messages.length - 1) {
-          numberOfCalls++;
+        System.out.println(readMessage());
+        if (numberOfCalls < messages.length) {
           sendMessage(messages[numberOfCalls]);
         }
       } catch (ClassNotFoundException classNotFoundException) {
@@ -87,13 +83,20 @@ public final class Initiator {
     }
   }
 
-  private void sendMessage(String message) throws IOException {
+  public final void sendMessage(String message) throws IOException {
     out.writeObject(message);
     out.flush();
+    numberOfCalls++;
+  }
+
+  public final String readMessage() throws IOException, ClassNotFoundException {
+    String message = (String) in.readObject();
+    numberOfReceives++;
+    return message;
   }
 
   // Setup and running the Initiator
-  private void openSocket() throws IOException {
+  public final void openSocket() throws IOException {
     clientSocket = new Socket(InetAddress.getLocalHost(), 4020);
     System.out.println(
         "Connected to" + InetAddress.getLocalHost() + " on port " + clientSocket.getPort());
@@ -102,7 +105,7 @@ public final class Initiator {
     out.flush();
   }
 
-  private void closeSocket() throws IOException {
+  public final void closeSocket() throws IOException {
     in.close();
     out.close();
     clientSocket.close();

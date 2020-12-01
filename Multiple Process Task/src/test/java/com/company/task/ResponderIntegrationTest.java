@@ -51,7 +51,7 @@ public class ResponderIntegrationTest {
   }
 
   @Test
-  public void givenClient_whenResponderEchosMessage_thenCorrect() throws IOException {
+  public void givenInitiator_whenResponderEchosMessage_thenCorrect() throws IOException {
     client.sendMessage(messages[numberOfCalls]);
     numberOfCalls++;
     while (numberOfReceives < messages.length) {

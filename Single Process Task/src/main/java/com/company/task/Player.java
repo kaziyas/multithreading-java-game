@@ -13,28 +13,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Initiator and Partner use a separate queue to manage a send and receive operations. The Initiator
  * object uses an array of messages to read the message sequentially and puts it in the Partner
  * queue. The Partner object get a message and reply it to the Initiator; It uses the Initiator
- * queue too. An AtomicInteger perform add or get operations on an int value without
- * using synchronized keyword in a multi-threaded context, so the number of calls and receives
- * messages keep in two separate fields. The send or receive operations depend on the message array
- * length, so you can add or delete the messages in a simple way.
+ * queue too. An AtomicInteger perform add or get operations on an int value without using
+ * synchronized keyword in a multi-threaded context, so the number of calls and receives messages
+ * keep in two separate fields. The send or receive operations depend on the message array length,
+ * so you can add or delete the messages in a simple way.
  */
 public final class Player implements Runnable {
+  private final static int MAX_MESSAGE_COUNT = 10;
+
   private final String name;
   private final String partner;
   private final boolean initiator;
   private final Queue queue;
-  private String[] messages = {
-    "Hello guys :)",
-    "My name is yaser!",
-    "I'm originally from Iran.",
-    "But, I am living in stuttgart now.",
-    "I am working as a Java Developer for many years.",
-    "I am fan of Java and related concepts.",
-    "I worked with monolith applications for many years.",
-    "I am working on microservice application now.",
-    "Have a good day.",
-    "Bye"
-  };
+  private String message = "hello";
 
   // Keep send or receive messages' count separately
   private AtomicInteger numberOfCalls = new AtomicInteger(0);
@@ -56,28 +47,19 @@ public final class Player implements Runnable {
     init();
     try {
       // The last partner's message sent when the number Of calls equal to messages' length
-      while (numberOfCalls.intValue() <= messages.length
-          && numberOfReceives.intValue() < messages.length) {
+      while (numberOfCalls.intValue() <= MAX_MESSAGE_COUNT
+          && numberOfReceives.intValue() < MAX_MESSAGE_COUNT) {
         if ((receivedMessage = queue.get(name)) != null) {
+          System.out.println(receivedMessage);
           if (initiator) {
             // The last partner's message touches in this line
-            System.out.println(receivedMessage);
-            if (numberOfCalls.intValue() < messages.length) {
-              String message = messages[numberOfCalls.intValue()];
-              queue.put(partner, message);
-              System.out.println(Thread.currentThread().getName() + " send a message: " + message);
+            if (numberOfCalls.intValue() < MAX_MESSAGE_COUNT) {
+              message = receivedMessage.concat(String.valueOf(numberOfCalls.intValue()));
             }
           } else {
-            String message =
-                Thread.currentThread().getName()
-                    + " : Client reply:"
-                    + "'"
-                    + receivedMessage.toUpperCase()
-                    + "', "
-                    + numberOfReceives.intValue()
-                    + " messages already sent before.";
-            queue.put(partner, message);
+            message = receivedMessage.concat(String.valueOf(numberOfReceives.intValue()));
           }
+          queue.put(partner, message);
           incrementCalls();
           incrementReceives();
         }
@@ -90,9 +72,8 @@ public final class Player implements Runnable {
   // Send the Initiator's first message
   private void init() {
     if (initiator) {
-      String message = messages[numberOfCalls.getAndIncrement()];
       queue.put(partner, message);
-      System.out.println(Thread.currentThread().getName() + " send a message: " + message);
+      numberOfCalls.getAndIncrement();
     }
   }
 

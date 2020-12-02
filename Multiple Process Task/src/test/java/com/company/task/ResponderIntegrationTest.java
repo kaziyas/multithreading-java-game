@@ -1,8 +1,6 @@
 package com.company.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,32 +16,19 @@ import org.junit.jupiter.api.Test;
 */
 
 public class ResponderIntegrationTest {
-  private Initiator client = new Initiator();
-  private String[] messages = {
-    "Hello guys :)",
-    "My name is yaser!",
-    "I'm originally from Iran.",
-    "But, I am living in stuttgart now.",
-    "I am working as a Java Developer for many years.",
-    "I am fan of Java and related concepts.",
-    "I worked with monolith applications for many years.",
-    "I am working with microservice application now.",
-    "Have a good day.",
-    "Bye"
-  };
-  private int numberOfCalls = 0;
-  private int numberOfReceives = 0;
+  private Player client = new Player(PlayerType.INITIATOR);
   private List<String> receivedMessages = new ArrayList<>();
 
   @BeforeEach
   public void start() throws InterruptedException, IOException {
-    Executors.newSingleThreadExecutor().submit(() -> new Responder().run());
+    Executors.newSingleThreadExecutor().submit(() -> new Player(PlayerType.RESPONDER).run());
     Thread.sleep(500);
     init();
   }
 
   public void init() throws IOException {
     client.openSocket();
+    receivedMessages.add("hello");
   }
 
   public void tearDown() throws IOException {
@@ -52,17 +37,16 @@ public class ResponderIntegrationTest {
 
   @Test
   public void givenInitiator_whenResponderEchosMessage_thenCorrect() throws IOException {
-    client.sendMessage(messages[numberOfCalls]);
-    numberOfCalls++;
-    while (numberOfReceives < messages.length) {
+    String message;
+    while (client.getNumberOfReceives() < Player.MAX_MESSAGE_COUNT
+        && client.getNumberOfCalls() <= Player.MAX_MESSAGE_COUNT) {
       try {
-        String message = client.readMessage();
+        message = client.readMessage();
         receivedMessages.add(message);
-        numberOfReceives++;
-
-        if (numberOfCalls < messages.length) {
-          client.sendMessage(messages[numberOfCalls]);
-          numberOfCalls++;
+        if (client.getNumberOfCalls() < Player.MAX_MESSAGE_COUNT) {
+          message = message.concat(String.valueOf(client.getNumberOfCalls()));
+          client.sendMessage(message);
+          receivedMessages.add(message);
         }
       } catch (ClassNotFoundException classNotFoundException) {
         System.err.println("Data received in unknown format");
@@ -70,11 +54,26 @@ public class ResponderIntegrationTest {
     }
     tearDown();
 
-    String firstMessage = "Server reply:'HELLO GUYS :)', 0 messages already sent before.";
-    assertEquals(10, numberOfCalls);
-    assertEquals(10, numberOfReceives);
-    assertEquals(10, receivedMessages.size());
-    assertEquals(receivedMessages.get(0), firstMessage);
-    assertNotEquals(receivedMessages.get(0), firstMessage.toLowerCase());
+    List<String> outputList = generateOutput();
+    assertEquals(10, client.getNumberOfCalls());
+    assertEquals(10, client.getNumberOfReceives());
+    assertEquals(20, receivedMessages.size());
+    assertEquals(outputList, receivedMessages);
+    assertEquals(outputList.get(7), receivedMessages.get(7));
+    assertEquals(outputList.get(13), receivedMessages.get(13));
+    assertEquals(outputList.get(19), receivedMessages.get(19));
+  }
+
+  private List<String> generateOutput() {
+    List<String> outputList = new ArrayList<>(20);
+    outputList.add("hello");
+    outputList.add("hello0");
+    for (int i = 1; i <= 9; i++) {
+      for (int j = 1; j <= 2; j++) {
+        int lastIndex = outputList.size() - 1;
+        outputList.add(outputList.get(lastIndex).concat(String.valueOf(i)));
+      }
+    }
+    return outputList;
   }
 }

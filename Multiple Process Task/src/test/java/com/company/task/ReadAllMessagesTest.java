@@ -13,14 +13,14 @@ public class ReadAllMessagesTest {
 
   public static void runResponder() {
     // Run Responder
-    Responder server = new Responder();
+    Player server = new Player(PlayerType.RESPONDER);
     server.run();
   }
 
   public static void runInitiator() {
     // Run Initiator
-    Initiator client = new Initiator();
-    client.run();
+    Player server = new Player(PlayerType.INITIATOR);
+    server.run();
   }
 
   @Test

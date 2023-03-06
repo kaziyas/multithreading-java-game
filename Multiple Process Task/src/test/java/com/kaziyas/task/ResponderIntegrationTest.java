@@ -1,4 +1,4 @@
-package com.company.task;
+package com.kaziyas.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

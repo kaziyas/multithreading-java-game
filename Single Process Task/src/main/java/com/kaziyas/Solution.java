@@ -1,7 +1,7 @@
-package com.company;
+package com.kaziyas;
 
-import com.company.task.Player;
-import com.company.task.Queue;
+import com.kaziyas.task.Player;
+import com.kaziyas.task.Queue;
 
 /*
  @author Yaser Kazerooni (yaser.kazerooni@gmail.com)

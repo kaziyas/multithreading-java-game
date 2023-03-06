@@ -1,4 +1,4 @@
-package com.company.task;
+package com.kaziyas.task;
 
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;

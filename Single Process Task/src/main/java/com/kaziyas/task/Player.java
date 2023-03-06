@@ -1,4 +1,4 @@
-package com.company.task;
+package com.kaziyas.task;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

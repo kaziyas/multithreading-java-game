@@ -1,4 +1,4 @@
-package com.company.task;
+package com.kaziyas.task;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -11,12 +11,9 @@ import java.net.Socket;
  * @since 1.0
  */
 
-/*
+/**
  * PlayerType helps a player object to find proper behavior on open and close behaviors. It depends
  * on type of a player, a true method runs in runtime.
- *
- * This solution recommends by Martin Fowler. It is to Replace Conditional with Polymorphism
- * (http://www.refactoring.com/catalog/replaceConditionalWithPolymorphism.html).
  *
  */
 public enum PlayerType {

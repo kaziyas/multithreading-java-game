@@ -1,4 +1,4 @@
-package com.company.task;
+package com.kaziyas.task;
 
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;

@@ -8,9 +8,8 @@
   <groupId>com.compnay</groupId>
   <artifactId>multiple-process-task</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>Multi Process Task</name>
-  <description>This challenge provided by technical recruiting team in the 360T Company.
-  </description>
+  <name>multiple process task</name>
+  <description>It's a challenge to work more on threads and processes in Java</description>
 
   <!--This project developed using java 11 features -->
   <properties>

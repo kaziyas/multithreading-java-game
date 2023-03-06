@@ -1,2 +1,2 @@
 @Echo off
-mvn clean install
+mvn -U clean install
